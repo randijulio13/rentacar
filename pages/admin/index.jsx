@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { MdDarkMode, MdLightMode } from "react-icons/md";
 import Template from "../../components/Template";
 
-export default function index() {
+export default function Index() {
   const [darkMode, setDarkMode] = useState(false);
   const handleDarkMode = () => {
     setDarkMode((darkMode) => !darkMode);
@@ -18,4 +18,4 @@ export default function index() {
   );
 }
 
-index.admin = true;
+Index.admin = true;

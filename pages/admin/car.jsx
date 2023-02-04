@@ -1,16 +1,16 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
-import Template from "../../components/Template";
-import DeleteCarModal from "../../components/DeleteCarModal";
-import Button from "../../components/Button";
-import { MdAddCircle } from "react-icons/md";
-import AddCarModal from "../../components/AddCarModal";
-import { toast } from "react-toastify";
-import qs from "querystring";
-import Link from "next/link";
 import classNames from "classnames";
+import Image from "next/image";
+import qs from "querystring";
+import React, { useCallback, useEffect, useState } from "react";
+import { MdAddCircle } from "react-icons/md";
+import { toast } from "react-toastify";
+import AddCarModal from "../../components/AddCarModal";
+import Button from "../../components/Button";
+import DeleteCarModal from "../../components/DeleteCarModal";
+import Template from "../../components/Template";
 
-export default function car() {
+export default function Car() {
   const [cars, setCars] = useState([]);
   const [deleteModal, setDeleteModal] = useState(false);
   const [addModal, setAddModal] = useState(false);
@@ -22,11 +22,11 @@ export default function car() {
     getCars();
   }, [page, limit]);
 
-  const getCars = async () => {
+  const getCars = useCallback(async () => {
     let query = { page, limit };
     let { data } = await axios.get(`/api/car?${qs.stringify(query)}`);
     setCars(data);
-  };
+  }, [page, limit]);
 
   const showDeleteModal = (id) => {
     setSelectedId(id);
@@ -66,7 +66,10 @@ export default function car() {
         >
           <MdAddCircle /> Add Data
         </Button>
-        <select onChange={(e) => setLimit(e.target.value)} className="bg-slate-700 hover:bg-slate-800 text-white px-3 py-1 rounded outline-none">
+        <select
+          onChange={(e) => setLimit(e.target.value)}
+          className="bg-slate-700 hover:bg-slate-800 text-white px-3 py-1 rounded outline-none"
+        >
           <option value="8">8</option>
           <option value="16">16</option>
           <option value="32">32</option>
@@ -120,6 +123,7 @@ export default function car() {
           {Array.from(Array(cars?.totalPage), (e, i) => {
             return (
               <button
+                key={i}
                 disabled={i + 1 == page}
                 className={classNames("px-4 py-2 border", {
                   "bg-slate-600 text-white": i + 1 == page,
@@ -157,4 +161,4 @@ export default function car() {
   );
 }
 
-car.admin = true;
+Car.admin = true;

@@ -1,17 +1,13 @@
-import { signIn, useSession } from "next-auth/react";
+import { AnimatePresence, motion } from "framer-motion";
+import { unstable_getServerSession } from "next-auth";
+import { signIn } from "next-auth/react";
 import React, {
-  Fragment,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
+  useState
 } from "react";
 import { useForm } from "react-hook-form";
-import { unstable_getServerSession } from "next-auth";
 import { authOptions } from "../api/auth/[...nextauth]";
-import { AnimatePresence, motion } from "framer-motion";
 
-export default function signin() {
+export default function Signin() {
   const {
     register,
     handleSubmit,
@@ -24,7 +20,7 @@ export default function signin() {
     message: "",
   });
 
-  let emailValidation = useMemo(() => {
+  let emailValidation = () => {
     return {
       required: "Email is required",
       pattern: {
@@ -33,9 +29,9 @@ export default function signin() {
         message: "Email format invalid",
       },
     };
-  });
+  };
 
-  let passwordValidation = useMemo(() => {
+  let passwordValidation = () => {
     return {
       required: "Password is required",
       minLength: {
@@ -43,15 +39,15 @@ export default function signin() {
         message: "Password must be at least 8 characters",
       },
     };
-  });
+  };
 
-  const hideAlert = useCallback(() => {
+  const hideAlert = () => {
     setAlert((alert) => {
       return { ...alert, display: false };
     });
-  });
+  };
 
-  const handleLogin = useCallback(async (data) => {
+  const handleLogin = async (data) => {
     hideAlert();
     let { email, password } = data;
     let res = await signIn("credentials", {
@@ -76,7 +72,7 @@ export default function signin() {
       hideAlert();
       location.reload();
     }, 2000);
-  });
+  };
 
   return (
     <>
@@ -108,7 +104,9 @@ export default function signin() {
               placeholder="user@example.com"
               type="text"
               className={`${
-                errors.email ? "outline-1 outline-offset-0 outline-red-500 focus:ring-red-200" : 'focus:ring-slate-300'
+                errors.email
+                  ? "outline-1 outline-offset-0 outline-red-500 focus:ring-red-200"
+                  : "focus:ring-slate-300"
               } py-2 px-4 outline-none w-full rounded focus:ring-4`}
             />
             {errors.email && (
@@ -125,7 +123,9 @@ export default function signin() {
               id="password"
               type="password"
               className={`${
-                errors.password ? "outline-1 outline-offset-0 outline-red-500 focus:ring-red-200" : 'focus:ring-slate-300'
+                errors.password
+                  ? "outline-1 outline-offset-0 outline-red-500 focus:ring-red-200"
+                  : "focus:ring-slate-300"
               } py-2 px-4 outline-none w-full rounded focus:ring-4`}
             />
             {errors.password && (

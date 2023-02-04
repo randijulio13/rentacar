@@ -18,7 +18,7 @@ export default function AddCarModal({ isOpen, closeModal, getCars }) {
 
   useEffect(() => {
     reset();
-  }, [isOpen]);
+  }, [isOpen, reset]);
 
   const onSubmit = async (data) => {
     console.log(errors.name);
@@ -44,23 +44,23 @@ export default function AddCarModal({ isOpen, closeModal, getCars }) {
     reset();
   };
 
-  const nameValidation = useMemo(() => {
+  const nameValidation = () => {
     return {
       required: "Name is required",
     };
-  });
+  };
 
-  const descriptionValidation = useMemo(() => {
+  const descriptionValidation = () => {
     return {
       required: "Description is required",
     };
-  });
+  };
 
-  const fileValidation = useMemo(() => {
+  const fileValidation = () => {
     return {
       required: "File is required",
     };
-  });
+  };
 
   return (
     <Modal {...{ isOpen, closeModal, sm: true }}>

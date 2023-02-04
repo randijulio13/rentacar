@@ -18,5 +18,5 @@ const InputText = forwardRef((props, ref) => {
     />
   );
 });
-
+InputText.displayName = "InputText";
 export default InputText;

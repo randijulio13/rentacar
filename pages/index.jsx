@@ -1,12 +1,12 @@
-import { signOut, signIn, useSession } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import React from "react";
 
-export default function index() {
+export default function Index() {
   const { data: session, status } = useSession();
   console.log(session);
   return (
     <div className="flex flex-col space-y-4 items-center justify-center min-h-screen bg-slate-200">
-      <h1>You're currently {status}</h1>
+      <h1>You&apos;re currently {status}</h1>
       {status === "unauthenticated" ? (
         <button
           onClick={() => signIn()}
