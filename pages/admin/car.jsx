@@ -59,7 +59,7 @@ export default function Car() {
 
   return (
     <Template>
-      <div className="flex gap-x-2 items-center mb-4">
+      <div className="flex gap-x-2 mb-4">
         <Button
           className="bg-slate-700 hover:bg-slate-800 text-white flex items-center gap-2"
           onClick={() => setAddModal(true)}
@@ -68,7 +68,7 @@ export default function Car() {
         </Button>
         <select
           onChange={(e) => setLimit(e.target.value)}
-          className="bg-slate-700 hover:bg-slate-800 text-white px-3 py-1 rounded outline-none"
+          className="bg-slate-700 hover:bg-slate-800 text-white px-3 py-1 min-h-full rounded outline-none"
         >
           <option value="8">8</option>
           <option value="16">16</option>

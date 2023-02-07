@@ -1,5 +1,5 @@
 import formidable from "formidable";
-import { unstable_getServerSession } from "next-auth";
+import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]";
 import prisma from "../../../lib/prismadb";
 import path from "path";
@@ -155,7 +155,7 @@ export default async function handler(req, res) {
     return await getData(req, res);
   }
 
-  const session = await unstable_getServerSession(req, res, authOptions);
+  const session = await getServerSession(req, res, authOptions);
   if (!session) {
     return res.status(403).send({
       error: "Unaothorized",
