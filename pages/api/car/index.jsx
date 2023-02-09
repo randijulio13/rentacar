@@ -1,10 +1,10 @@
 import { getServerSession } from "next-auth";
-import prisma from "../../../lib/prismadb";
 import { authOptions } from "../auth/[...nextauth]";
-import nc from "next-connect";
-import multer from "multer";
 import DataURIParser from "datauri/parser";
+import nextConnect from "next-connect";
 import cloudinary from '../../../lib/cloudinary'
+import prisma from "../../../lib/prismadb";
+import multer from "multer";
 import path from 'path'
 
 export const config = {
@@ -12,7 +12,8 @@ export const config = {
     bodyParser: false,
   },
 };
-const handler = nc({
+
+const handler = nextConnect({
   onError: (err, req, res, next) => {
     console.error(err.stack);
     res.status(500).end("Something broke!");
@@ -41,7 +42,7 @@ const handler = nc({
     throw new Error("Throws me around! Error can be caught and handled.");
   });
 
-const getTotalData = async () => {
+async function getTotalData() {
   let { _all } = await prisma.car.count({
     select: {
       _all: true,
@@ -86,23 +87,28 @@ async function getData(req, res) {
   return res.status(200).json(data);
 }
 
-async function storeData(req, res) {
-  const { name, description } = req.body
+async function uploadImage(req, id) {
   const parser = new DataURIParser();
-  let { id } = await prisma.car.create({
-    data: {
-      name,
-      description,
-    },
-  });
-
   const image = req.files.filter((file) => file.fieldname === 'image')[0];
   const base64Image = parser.format(path.extname(image.originalname).toString(), image.buffer);
   const cloudinaryRes = await cloudinary.uploader.upload(base64Image.content, { public_id: id });
   const imageUrl = cloudinaryRes.secure_url;
+  return imageUrl;
+}
 
+async function storeData(req, res) {
+  const { name, description, color, price } = req.body
+  let { id } = await prisma.car.create({
+    data: {
+      name,
+      description,
+      color,
+      price:parseInt(price)
+    },
+  });
+
+  let imageUrl = await uploadImage(req, id)
   await prisma.car.update({ where: { id }, data: { image: imageUrl } })
-
   return res.status(200).json({ message: "Data added successfully" });
 }
 

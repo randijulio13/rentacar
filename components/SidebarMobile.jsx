@@ -1,4 +1,5 @@
 import { Dialog, Transition } from "@headlessui/react";
+import Link from "next/link";
 import { Fragment } from "react";
 import { MdDirectionsCar } from "react-icons/md";
 
@@ -42,13 +43,17 @@ export default function SidebarMobile({ isOpen, closeSidebar, handleSidebar, men
             <div className="py-2 overflow-x-hidden overflow-y-auto flex-1">
               {menus.map((menu, index) => {
                 return (
-                  <button
+                  <Link
+                    href={menu.link}
                     key={index}
-                    className="outline-none flex items-center gap-x-4 pl-8 w-full text-white hover:text-yellow-500 hover:bg-slate-800 py-2 hover:scale-110 focus:text-yellow-500 focus:bg-slate-800 focus:scale-110 duration-200"
+                    className={`flex w-full items-center gap-x-4 py-2 pl-8 text-white outline-none duration-200 hover:scale-110 hover:bg-slate-800 hover:text-yellow-500 focus:bg-slate-800 ${menu.active == true
+                        ? "scale-110 bg-slate-800 text-yellow-500"
+                        : ""
+                      }`}
                   >
                     {menu.icon}
                     {menu.title}
-                  </button>
+                  </Link>
                 );
               })}
             </div>

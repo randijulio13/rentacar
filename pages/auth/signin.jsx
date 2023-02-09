@@ -76,72 +76,69 @@ export default function Signin() {
 
   return (
     <>
-      <div className="bg-gradient-to-b from-slate-800 to-slate-900 flex flex-col items-center justify-center min-h-screen">
-        <form
-          onSubmit={handleSubmit(handleLogin)}
-          className="bg-slate-200 p-6 rounded-md shadow-sm w-2/6 duration-200 min-h-auto"
-        >
-          <AnimatePresence>
+      <AnimatePresence>
+        <div className="bg-gradient-to-b from-slate-800 px-4 to-slate-900 flex flex-col items-center justify-center min-h-screen">
+          <form
+            onSubmit={handleSubmit(handleLogin)}
+            className="bg-slate-200 p-6 rounded-md shadow-sm w-full md:w-1/2 lg:w-1/3 duration-200 min-h-auto"
+          >
             {alert.display && (
               <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ ease: "easeIn", duration: 0.5 }}
-                className={`${
-                  alert.type == "success" ? "bg-green-600" : "bg-red-500"
-                } rounded-md p-4 mb-4 text-white`}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ ease: "easeIn", duration: 0.1 }}
+                className={`${alert.type == "success" ? "bg-green-600" : "bg-red-500"
+                  } rounded-md p-4 mb-4 text-white`}
               >
                 {alert.message}
               </motion.div>
             )}
-          </AnimatePresence>
-          <div className="mb-4">
-            <label htmlFor="email">Email</label>
-            <input
-              {...register("email", emailValidation)}
-              id="email"
-              placeholder="user@example.com"
-              type="text"
-              className={`${
-                errors.email
+            <div className="mb-4">
+              <label htmlFor="email">Email</label>
+              <input
+                {...register("email", emailValidation)}
+                id="email"
+                placeholder="user@example.com"
+                type="text"
+                className={`${errors.email
                   ? "outline-1 outline-offset-0 outline-red-500 focus:ring-red-200"
                   : "focus:ring-slate-300"
-              } py-2 px-4 outline-none w-full rounded focus:ring-4`}
-            />
-            {errors.email && (
-              <span className="text-sm text-red-500">
-                {errors.email.message}
-              </span>
-            )}
-          </div>
-          <div className="mb-4">
-            <label htmlFor="password">Password</label>
-            <input
-              placeholder="Password"
-              {...register("password", passwordValidation)}
-              id="password"
-              type="password"
-              className={`${
-                errors.password
+                  } py-2 px-4 outline-none w-full rounded focus:ring-4`}
+              />
+              {errors.email && (
+                <span className="text-sm text-red-500">
+                  {errors.email.message}
+                </span>
+              )}
+            </div>
+            <div className="mb-4">
+              <label htmlFor="password">Password</label>
+              <input
+                placeholder="Password"
+                {...register("password", passwordValidation)}
+                id="password"
+                type="password"
+                className={`${errors.password
                   ? "outline-1 outline-offset-0 outline-red-500 focus:ring-red-200"
                   : "focus:ring-slate-300"
-              } py-2 px-4 outline-none w-full rounded focus:ring-4`}
-            />
-            {errors.password && (
-              <span className="text-sm text-red-500">
-                {errors.password.message}
-              </span>
-            )}
-          </div>
-          <button
-            className="px-4 py-2 rounded bg-yellow-500 text-white hover:bg-yellow-600 duration-200 outline-none focus:ring-2 focus:ring-yellow-200"
-            type="submit"
-          >
-            Login
-          </button>
-        </form>
-      </div>
+                  } py-2 px-4 outline-none w-full rounded focus:ring-4`}
+              />
+              {errors.password && (
+                <span className="text-sm text-red-500">
+                  {errors.password.message}
+                </span>
+              )}
+            </div>
+            <button
+              className="px-4 py-2 rounded bg-yellow-500 text-white hover:bg-yellow-600 duration-200 outline-none focus:ring-2 focus:ring-yellow-200"
+              type="submit"
+            >
+              Login
+            </button>
+          </form>
+        </div>
+      </AnimatePresence>
     </>
   );
 }
