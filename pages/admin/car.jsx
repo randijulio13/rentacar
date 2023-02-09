@@ -68,7 +68,7 @@ export default function Car() {
         </Button>
         <select
           onChange={(e) => setLimit(e.target.value)}
-          className="bg-slate-700 hover:bg-slate-800 text-white px-3 py-1 min-h-full rounded outline-none"
+          className="border bg-white active:ring px-3 py-1 min-h-full rounded outline-none first-letter"
         >
           <option value="8">8</option>
           <option value="16">16</option>
@@ -84,7 +84,7 @@ export default function Car() {
             >
               <div className="h-44 bg-red-500 overflow-hidden items-center">
                 <img
-                  src={`/images/${car.image}`}
+                  src={car.image}
                   alt=""
                   className="object-cover min-h-full w-full hover:scale-105 duration-200"
                 />

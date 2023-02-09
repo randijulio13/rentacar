@@ -1,43 +1,45 @@
-import formidable from "formidable";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/[...nextauth]";
 import prisma from "../../../lib/prismadb";
-import path from "path";
-import fs from "fs/promises";
-import qs from "querystring";
+import { authOptions } from "../auth/[...nextauth]";
+import nc from "next-connect";
+import multer from "multer";
+import DataURIParser from "datauri/parser";
+import cloudinary from '../../../lib/cloudinary'
+import path from 'path'
 
 export const config = {
   api: {
     bodyParser: false,
   },
 };
-
-const readFile = (req, saveLocally = false) => {
-  const options = {};
-
-  if (saveLocally) {
-    options.uploadDir = path.join(process.cwd(), "/public/images");
-    options.filename = (name, ext, part, form) => {
-      return `${Date.now().toString()}${path.extname(part.originalFilename)}`;
-    };
-    options.keepExtensions = true;
-  }
-
-  const form = formidable(options);
-  return new Promise((resolve, reject) => {
-    form.parse(req, (err, fields, files) => {
-      if (err) reject(err);
-      resolve({ fields, files });
-    });
+const handler = nc({
+  onError: (err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).end("Something broke!");
+  },
+  onNoMatch: (req, res) => {
+    res.status(404).end("Page is not found");
+  },
+})
+  .use(multer().any())
+  .get((req, res) => {
+    getData(req, res)
+  })
+  .post(async (req, res) => {
+    const session = await getServerSession(req, res, authOptions);
+    if (!session) {
+      return res.status(403).send({
+        error: "Unaothorized",
+      });
+    }
+    storeData(req, res)
+  })
+  .put(async (req, res) => {
+    res.end("async/await is also supported!");
+  })
+  .patch(async (req, res) => {
+    throw new Error("Throws me around! Error can be caught and handled.");
   });
-};
-
-const generateLink = (limit, page) => {
-  let query = {};
-  query.limit = limit;
-  query.page = page;
-  return `${process.env.BASE_URL}/api/car?${qs.stringify(query)}`;
-};
 
 const getTotalData = async () => {
   let { _all } = await prisma.car.count({
@@ -57,52 +59,10 @@ const getTotalPage = (limit, totalData) => {
   return totalPage;
 };
 
-const getPagination = async (limit, page, totalData) => {
-  limit = parseInt(limit);
-  page = parseInt(page);
-  let links = [];
-  let totalPage = getTotalPage(limit, totalData);
-  let prevPageUrl = page <= 1 ? null : generateLink(limit, page - 1);
-  let nextPageUrl = page >= totalPage ? null : generateLink(limit, page + 1);
-  let firstPageUrl = generateLink(limit, 1);
-  let lastPageUrl = generateLink(limit, totalPage);
-
-  links.push({
-    url: prevPageUrl,
-    label: "Previous Page",
-    active: false,
-  });
-  for (let i = 1; i <= totalPage; i++) {
-    links.push({
-      url: generateLink(limit, i),
-      label: i,
-      active: i == page,
-    });
-  }
-  links.push({
-    url: nextPageUrl,
-    label: "Next Page",
-    active: false,
-  });
-
-  return {
-    currentPage: page,
-    totalData,
-    totalPage,
-    perPage: limit,
-    nextPageUrl,
-    prevPageUrl,
-    firstPageUrl,
-    lastPageUrl,
-    links,
-  };
-};
-
 async function getData(req, res) {
   let { page, limit } = req.query;
   let filter = {};
   let totalData = await getTotalData();
-  let pagination = {};
 
   if (limit) {
     filter.take = parseInt(limit);
@@ -116,53 +76,34 @@ async function getData(req, res) {
     }
     page = parseInt(page);
     filter.skip = (page - 1) * parseInt(limit);
-    pagination = await getPagination(limit, page, totalData);
   }
 
   let car = await prisma.car.findMany(filter);
   let data = { message: "OK", data: car, totalData };
   if (page) {
-    data.totalPage = pagination.totalPage;
+    data.totalPage = getTotalPage(limit, totalData);
   }
   return res.status(200).json(data);
 }
 
 async function storeData(req, res) {
-  try {
-    await fs.readdir(path.join(process.cwd() + "/public", "/images"));
-  } catch (err) {
-    await fs.mkdir(path.join(process.cwd() + "/public", "/images"));
-  }
-
-  let {
-    fields: { name, description },
-    files,
-  } = await readFile(req, true);
-
-  await prisma.car.create({
+  const { name, description } = req.body
+  const parser = new DataURIParser();
+  let { id } = await prisma.car.create({
     data: {
       name,
       description,
-      image: files.image.newFilename,
     },
   });
+
+  const image = req.files.filter((file) => file.fieldname === 'image')[0];
+  const base64Image = parser.format(path.extname(image.originalname).toString(), image.buffer);
+  const cloudinaryRes = await cloudinary.uploader.upload(base64Image.content, { public_id: id });
+  const imageUrl = cloudinaryRes.secure_url;
+
+  await prisma.car.update({ where: { id }, data: { image: imageUrl } })
 
   return res.status(200).json({ message: "Data added successfully" });
 }
 
-export default async function handler(req, res) {
-  if (req.method === "GET") {
-    return await getData(req, res);
-  }
-
-  const session = await getServerSession(req, res, authOptions);
-  if (!session) {
-    return res.status(403).send({
-      error: "Unaothorized",
-    });
-  }
-
-  if (req.method === "POST") {
-    return await storeData(req, res);
-  }
-}
+export default handler;

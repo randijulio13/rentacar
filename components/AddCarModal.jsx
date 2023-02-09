@@ -104,10 +104,11 @@ export default function AddCarModal({ isOpen, closeModal, getCars }) {
             )}
           </div>
           <div className="flex gap-x-2">
-            <Button className="bg-yellow-500 hover:bg-yellow-600 text-white">
+            <Button className="bg-yellow-500 hover:bg-yellow-600 text-white" type="submit">
               Submit
             </Button>
             <Button
+              type="button"
               className="bg-slate-500 hover:bg-slate-600 text-white"
               onClick={closeModal}
             >
