@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "../auth/[...nextauth]";
 import cloudinary from '../../../lib/cloudinary'
 import nextConnect from "next-connect";
+import prisma from '../../../lib/prismadb'
 
 const handler = nextConnect({
   onError: (err, req, res, next) => {
